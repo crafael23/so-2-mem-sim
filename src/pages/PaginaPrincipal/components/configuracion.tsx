@@ -22,7 +22,7 @@ import Confirmacion from './confirmacion';
 import { useHistory } from 'react-router-dom';
 
 const Configuracion: React.FC = () => {
-  const history = useHistory();
+  
 
   const [cantidadMemoria, setCantidadMemoria] = useState('');
   const [cantidadParticiones, setCantidadParticiones] = useState('');
@@ -77,16 +77,11 @@ const Configuracion: React.FC = () => {
     }
   };
 
+  const history = useHistory();
+  
   const handleConfirm = () => {
 
     setShowModal(false);
-    console.log('Memoria:', cantidadMemoria);
-    console.log('Particiones:', cantidadParticiones);
-    console.log('Mejor ajuste:', mejorAjuste);
-    console.log('Primer ajuste:', primerAjuste);
-    console.log('Politica seleccionada', politica);
-    console.log('Lower value:', lowerValue);
-    console.log('Upper value:', upperValue);
 
     const params = new URLSearchParams({
       memoria: cantidadMemoria,
@@ -97,9 +92,6 @@ const Configuracion: React.FC = () => {
       lowerValue: lowerValue.toString(),
       upperValue: upperValue.toString(),
     });
-
-    console.log(params.toString());
-
     history.push(`/simulacion?${params.toString()}`); 
   };
 
@@ -255,7 +247,7 @@ const Configuracion: React.FC = () => {
         isOpen={showToast}
         onDidDismiss={handleToastDismiss}
         message={toastMessage}
-        duration={3000}
+        duration={1500}
       />
     </>
   );
