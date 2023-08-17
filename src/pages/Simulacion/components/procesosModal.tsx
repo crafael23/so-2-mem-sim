@@ -14,20 +14,18 @@ import {
   IonToolbar,
 } from '@ionic/react';
 import AgregarProcesoModal from './agregarProcesoModal';
+import { Proceso } from '../../../Types';
 
-type Estado = 'en memoria' | 'en espera de memoria' | 'terminado';
-interface Proceso {
-  id: number;
-  nombre: string;
-  memoria: number;
-  estado: Estado;
-}
+
+
 interface ProcesosModalProps {
   isOpen: boolean;
   onDidDismiss: () => void;
   handleAgregarProceso: (procesosReturn: Proceso[]) => void;
   procesos: Proceso[];
   tamañoMaximoProceso: number;
+  tiempoMaximo: number;
+  tiempoMinimo: number;
 }
 
 const ProcesosModal: React.FC<ProcesosModalProps> = (props) => {
@@ -38,6 +36,12 @@ const ProcesosModal: React.FC<ProcesosModalProps> = (props) => {
   const [showModalAgregarProceso, setShowModalAgregarProceso] = useState(false);
   
   const { tamañoMaximoProceso } = props;
+
+  useEffect(() => {
+    setProcesos(props.procesos);
+  },[props.procesos]);
+
+  
 
   const handleShowModalAgregarProceso = () => {
     setShowModalAgregarProceso(true);
@@ -99,6 +103,10 @@ const ProcesosModal: React.FC<ProcesosModalProps> = (props) => {
                   <IonLabel>Estado</IonLabel>
                   <IonChip>{proceso.estado}</IonChip>
                 </IonCol>
+                <IonCol>
+                  <IonLabel>duracion</IonLabel>
+                  <IonChip>{proceso.duracion}s</IonChip>
+                </IonCol>
               </IonRow>
             );
           })}
@@ -109,6 +117,8 @@ const ProcesosModal: React.FC<ProcesosModalProps> = (props) => {
         onAgregar={handleAgregarProcesoModal}
         onClose={handleDismissModalAgregarProceso}
         tamañoMaximoProceso={tamañoMaximoProceso}
+        tiempoMaximoProceso={props.tiempoMaximo}
+        tiempoMinimoProceso={props.tiempoMinimo}
       />
 
       <IonFooter>

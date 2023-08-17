@@ -23,6 +23,9 @@ import ConfiguracionParticiones from './components/configuracionParticiones';
 import ParticionesCards from './components/particionesCard';
 import ProcesosModal from './components/procesosModal';
 import ListaDeProcesos from './components/listaDeProcesos';
+import { Proceso } from '../../Types';
+
+const worker = new Worker('/src/webworker.ts', { type: 'module' });
 
 const Simulacion: React.FC = () => {
   const location = useLocation();
@@ -41,6 +44,8 @@ const Simulacion: React.FC = () => {
   const [particionesConfiguradas, setParticionesConfiguradas] = useState<
     number[]
   >([]);
+
+  const [simulacionIniciada, setSimulacionIniciada] = useState(false);
 
   const [tamañoMaximoProceso, setTamañoMaximoProceso] = useState<number>(0);
 
@@ -75,7 +80,6 @@ const Simulacion: React.FC = () => {
     }
   }, [particionesConfiguradas]);
 
-
   const handlePartitionDismiss = () => {
     setShowPartitionSetup(false);
   };
@@ -102,34 +106,66 @@ const Simulacion: React.FC = () => {
     ParticionEjecutada[]
   >([]);
 
-  type Estado = 'en memoria' | 'en espera de memoria' | 'terminado';
-
-  interface Proceso {
-    id: number;
-    nombre: string;
-    memoria: number;
-    estado: Estado;
-  }
-
   const [procesos, setProcesos] = useState<Proceso[]>([]);
 
   const [showModalProcesos, setShowModalProcesos] = useState(false);
 
   const handleShowModalProcesos = () => {
+    if (simulacionIniciada) {
+      detener();
+    }
     setShowModalProcesos(true);
   };
 
   const handleDismissModalProcesos = () => {
     setShowModalProcesos(false);
   };
+  const [nuevoProcesoAgregado, setNuevoProcesoAgregado] =
+    useState<boolean>(false);
   const handleAgregarProceso = (procesosReturn: Proceso[]) => {
     if (procesosReturn == procesos) {
+      return;
     } else {
+      if (simulacionIniciada) {
+        setNuevoProcesoAgregado(true);
+      }
       setProcesos(procesosReturn);
     }
   };
 
-  
+  useEffect(() => {
+    if (nuevoProcesoAgregado && simulacionIniciada) {
+      setNuevoProcesoAgregado(false);
+      simular();
+    }
+  }, [nuevoProcesoAgregado]);
+
+  const simular = () => {
+    const continuar = true;
+    const data = {
+      procesos,
+      particionesEjecutadas,
+      continuar,
+      politica,
+    };
+    setSimulacionIniciada(true);
+    worker.postMessage(data);
+  };
+
+  worker.onmessage = (event: MessageEvent) => {
+    const modifiedArrays: any = event.data;
+    setParticionesEjecutadas(modifiedArrays.particiones);
+    setProcesos(modifiedArrays.procesos);
+  };
+
+  const detener = () => {
+    
+    const continuar = false;
+    const data = {
+      continuar,
+    };
+    worker.postMessage(data);
+  };
 
   return (
     <>
@@ -142,7 +178,6 @@ const Simulacion: React.FC = () => {
                   <IonTitle>Simulación</IonTitle>
                 </IonCol>
               </IonRow>
-
               <IonRow className="ion-justify-content-center">
                 <IonCol>
                   <IonButton onClick={handleShowConfig}>
@@ -172,7 +207,10 @@ const Simulacion: React.FC = () => {
 
             <IonRow>
               <IonCol className="ion-justify-content-center">
-                <IonButton>Simular</IonButton>
+                <IonButton onClick={simular}>Simular</IonButton>
+              </IonCol>
+              <IonCol>
+                <IonButton onClick={detener}>Detener</IonButton>
               </IonCol>
             </IonRow>
             <IonRow>
@@ -214,6 +252,8 @@ const Simulacion: React.FC = () => {
         onDidDismiss={handleDismissModalProcesos}
         procesos={procesos}
         tamañoMaximoProceso={tamañoMaximoProceso}
+        tiempoMaximo={parseInt(upperValue as string)}
+        tiempoMinimo={parseInt(lowerValue as string)}
       />
     </>
   );

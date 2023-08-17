@@ -14,20 +14,17 @@ import {
   IonTitle,
   IonToast,
 } from '@ionic/react';
+import { Estado, Proceso } from '../../../Types';
 
-type Estado = 'en memoria' | 'en espera de memoria' | 'terminado';
-interface Proceso {
-  id: number;
-  nombre: string;
-  memoria: number;
-  estado: Estado;
-}
+
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   onAgregar: (proceso: Proceso) => void;
   tamañoMaximoProceso: number;
+  tiempoMaximoProceso: number;
+  tiempoMinimoProceso: number;
 }
 
 const AgregarProcesoModal: React.FC<Props> = ({
@@ -35,6 +32,8 @@ const AgregarProcesoModal: React.FC<Props> = ({
   onClose,
   onAgregar,
   tamañoMaximoProceso,
+  tiempoMaximoProceso,
+  tiempoMinimoProceso,
 }) => {
   const [id, setId] = useState<number>(0);
   const [nombre, setNombre] = useState<string>('');
@@ -45,17 +44,32 @@ const AgregarProcesoModal: React.FC<Props> = ({
   const [toastMessage, setToastMessage] = useState<string>('');
 
   const handleToastDismiss = () => {
-    
     setShowToast(false);
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (
+      !id ||
+      id === 0 ||
+      !nombre ||
+      nombre === '' ||
+      !memoria ||
+      memoria === 0
+    ) {
+      setShowToast(true);
+      setToastMessage('Los datos no están configurados correctamente');
+      return;
+    }
+
     const proceso: Proceso = {
       id: id,
       nombre: nombre,
       memoria: memoria,
       estado: estado,
+      duracion: getRandomNumber(tiempoMinimoProceso, tiempoMaximoProceso),
+      transcurrido: 0,
     };
     onAgregar(proceso);
     setMemoria(0);
@@ -82,6 +96,13 @@ const AgregarProcesoModal: React.FC<Props> = ({
       setMemoria(valor);
     }
   };
+
+  function getRandomNumber(min: number, max: number): number {
+    const random = Math.random();
+    const range = max - min;
+    const finalRandom = (random * range + min).toFixed(2);
+    return parseFloat(finalRandom);
+  }
 
   return (
     <IonModal isOpen={isOpen} onDidDismiss={onClose}>

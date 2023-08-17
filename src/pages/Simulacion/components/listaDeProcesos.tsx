@@ -1,14 +1,8 @@
 import { IonCol, IonList, IonItem, IonLabel, IonChip } from '@ionic/react';
 import React from 'react';
+import { Proceso } from '../../../Types';
 
-type Estado = 'en memoria' | 'en espera de memoria' | 'terminado';
 
-interface Proceso {
-  id: number;
-  nombre: string;
-  memoria: number;
-  estado: Estado;
-}
 interface Props {
   procesos: Proceso[];
 }
@@ -41,6 +35,14 @@ const ListaDeProcesos: React.FC<Props> = (props) => {
                   ? 'Ejecutandose'
                   : 'Terminado'}
               </IonChip>
+            </IonItem>
+            <IonItem>
+              <IonLabel>Duracion</IonLabel>
+              <IonChip>{proceso.duracion}</IonChip>
+            </IonItem>
+            <IonItem>
+              <IonLabel>Transcurrido</IonLabel>
+              <IonChip>{proceso.transcurrido} </IonChip>
             </IonItem>
           </IonList>
         </IonCol>
