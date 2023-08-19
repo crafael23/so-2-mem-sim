@@ -1,4 +1,11 @@
-import { IonCol, IonList, IonItem, IonLabel, IonChip } from '@ionic/react';
+import {
+  IonCol,
+  IonList,
+  IonItem,
+  IonLabel,
+  IonChip,
+  IonRow,
+} from '@ionic/react';
 import React from 'react';
 import { Proceso } from '../../../Types';
 
@@ -11,8 +18,8 @@ const ListaDeProcesos: React.FC<Props> = (props) => {
   return (
     <>
       {procesos.map((proceso) => (
-        <IonCol className="ion-justify-content-center" key={proceso.id}>
-          <IonList>
+        <IonRow key={proceso.id}>
+          <IonCol className="ion-justify-content-center">
             <IonItem>
               <IonLabel>Id</IonLabel>
               <IonChip>{proceso.id}</IonChip>
@@ -44,15 +51,12 @@ const ListaDeProcesos: React.FC<Props> = (props) => {
               <IonChip>{proceso.transcurrido} </IonChip>
             </IonItem>
 
-            
             <IonItem>
               <IonLabel>Tiempo total en sistema</IonLabel>
-              <IonChip>
-                {proceso.tiempoTotalEnSistema/1000}s
-              </IonChip>
+              <IonChip>{proceso.tiempoTotalEnSistema / 1000}s</IonChip>
             </IonItem>
-          </IonList>
-        </IonCol>
+          </IonCol>
+        </IonRow>
       ))}
     </>
   );

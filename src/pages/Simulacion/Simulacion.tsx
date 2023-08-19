@@ -111,6 +111,7 @@ const Simulacion: React.FC = () => {
   const [procesos, setProcesos] = useState<Proceso[]>([]);
 
   const [showModalProcesos, setShowModalProcesos] = useState(false);
+  
 
   const handleShowModalProcesos = () => {
     if (simulacionIniciada) {
@@ -222,9 +223,9 @@ const Simulacion: React.FC = () => {
                 <IonTitle>Tabla de procesos</IonTitle>
               </IonCol>
             </IonRow>
-            <IonRow>
+            
               {procesos.length > 0 && <ListaDeProcesos procesos={procesos} />}
-            </IonRow>
+            
           </IonGrid>
         </IonContent>
       </IonPage>
