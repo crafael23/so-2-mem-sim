@@ -7,6 +7,9 @@ export interface Proceso {
   estado: Estado;
   duracion: number;
   transcurrido: number;
+  tiempoCreacion: Date;
+  tiempoFinalizacion?: Date;
+  tiempoTotalEnSistema: number;
 }
 
 export interface ParticionEjecutada {

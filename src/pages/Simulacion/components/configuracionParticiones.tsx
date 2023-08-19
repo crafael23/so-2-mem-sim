@@ -41,7 +41,7 @@ const ConfiguracionParticiones: React.FC<Props> = (props) => {
   const numeros = [];
 
   for (let i = 0; i < numParticiones; i++) {
-    numeros.push(0);
+    numeros.push(NaN);
   }
 
   const [toastMessage, setToastMessage] = useState<string>('');
@@ -58,18 +58,15 @@ const ConfiguracionParticiones: React.FC<Props> = (props) => {
 
   const [particionMayor, setParticionMayor] = useState<number>(0);
 
-  useEffect(()=>{
+  useEffect(() => {
     let mayor = 0;
-    particiones.forEach((particion)=>{
-      if(particion>mayor){
+    particiones.forEach((particion) => {
+      if (particion > mayor) {
         mayor = particion;
         setParticionMayor(mayor);
       }
-    })
-    
-
-  },[particiones])
-
+    });
+  }, [particiones]);
 
   const handleChange = (key: number, value: string) => {
     const newParticiones = [...particiones];
@@ -80,8 +77,33 @@ const ConfiguracionParticiones: React.FC<Props> = (props) => {
   const handleInputChange = (key: number) => (event: CustomEvent) => {
     const cantidad = parseInt(event.detail.value!);
 
-    if (cantidad <= memDisponible) {
-      setMemDisponible(memDisponible - cantidad);
+    let MemoriaDisponible = memDisponible;
+
+    if (Number.isNaN(cantidad) || cantidad === 0) {
+      console.log('el numero es NaN o es cero');
+      const newParticiones = [...particiones];
+
+      if (particiones[key] === undefined || Number.isNaN(particiones[key])) {
+        return;
+      } else if (particiones[key] > 0) {
+        setMemDisponible(memDisponible + particiones[key]);
+        newParticiones[key] = NaN;
+        setParticiones(newParticiones);
+      }
+      return;
+    }
+
+    if (particiones[key] > 0 && !Number.isNaN(particiones[key])) {
+      console.log('esa particcion ya tiene un vaalor asignado, borrando');
+      MemoriaDisponible = MemoriaDisponible + particiones[key];
+    }
+
+    console.log(MemoriaDisponible);
+    if (cantidad <= MemoriaDisponible) {
+
+      console.log("cantidad menor a memoria disponible");
+      MemoriaDisponible = MemoriaDisponible - cantidad;
+      setMemDisponible(MemoriaDisponible);
       handleChange(key, event.detail.value!);
     } else {
       setToastMessage(
@@ -116,9 +138,7 @@ const ConfiguracionParticiones: React.FC<Props> = (props) => {
   }
 
   const handleConfirm = () => {
-    
-
-    onConfirm(particionMayor,particiones);
+    onConfirm(particionMayor, particiones);
   };
 
   const handleCancel = () => {

@@ -70,6 +70,8 @@ const AgregarProcesoModal: React.FC<Props> = ({
       estado: estado,
       duracion: getRandomNumber(tiempoMinimoProceso, tiempoMaximoProceso),
       transcurrido: 0,
+      tiempoCreacion: new Date(),
+      tiempoTotalEnSistema: 0,
     };
     onAgregar(proceso);
     setMemoria(0);
@@ -175,7 +177,7 @@ const AgregarProcesoModal: React.FC<Props> = ({
                 <IonButton type="submit">Agregar</IonButton>
               </IonCol>
               <IonCol size="%">
-                <IonButton>cancelar</IonButton>
+                <IonButton onClick={onClose}>cancelar</IonButton>
               </IonCol>
             </IonRow>
           </form>

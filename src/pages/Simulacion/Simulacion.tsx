@@ -25,7 +25,9 @@ import ProcesosModal from './components/procesosModal';
 import ListaDeProcesos from './components/listaDeProcesos';
 import { Proceso } from '../../Types';
 
-const worker = new Worker('/src/webworker.ts', { type: 'module' });
+const worker = new Worker('src/webworker.ts', {
+  type: 'module',
+});
 
 const Simulacion: React.FC = () => {
   const location = useLocation();
@@ -141,6 +143,7 @@ const Simulacion: React.FC = () => {
   }, [nuevoProcesoAgregado]);
 
   const simular = () => {
+    console.log('simular');
     const continuar = true;
     const data = {
       procesos,
@@ -154,12 +157,13 @@ const Simulacion: React.FC = () => {
 
   worker.onmessage = (event: MessageEvent) => {
     const modifiedArrays: any = event.data;
+
+    console.log(modifiedArrays);
     setParticionesEjecutadas(modifiedArrays.particiones);
     setProcesos(modifiedArrays.procesos);
   };
 
   const detener = () => {
-    
     const continuar = false;
     const data = {
       continuar,

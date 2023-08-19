@@ -107,6 +107,11 @@ const ProcesosModal: React.FC<ProcesosModalProps> = (props) => {
                   <IonLabel>duracion</IonLabel>
                   <IonChip>{proceso.duracion}s</IonChip>
                 </IonCol>
+
+                <IonCol>
+                  <IonLabel>TiempoCreacion</IonLabel>
+                  <IonChip>{proceso.tiempoCreacion.toString()}s</IonChip>
+                </IonCol>
               </IonRow>
             );
           })}

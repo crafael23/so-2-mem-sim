@@ -1,4 +1,24 @@
-import { Proceso, ParticionEjecutada } from './Types';
+type Estado = 'en memoria' | 'en espera de memoria' | 'terminado';
+
+interface Proceso {
+  id: number;
+  nombre: string;
+  memoria: number;
+  estado: Estado;
+  duracion: number;
+  transcurrido: number;
+  tiempoCreacion: Date;
+  tiempoFinalizacion?: Date;
+  tiempoTotalEnSistema: number;
+}
+
+interface ParticionEjecutada {
+  id: number;
+  MemoriaDeParticion: number;
+  Proceso?: string;
+  UtilizacionPorcentaje?: number;
+  Libre?: boolean;
+}
 
 let continuar: boolean;
 
@@ -20,21 +40,13 @@ async function modificarDatos(
 ) {
   const manager = new managerDeMemoria(particionesEjecutadas, procesos);
   do {
-    console.log('Looping...');
-
-    
     manager.procesos.forEach((proceso) => {
-      console.log(proceso.nombre, proceso.estado);
       if (proceso.estado === 'terminado') return;
-      
+
       if (proceso.estado === 'en espera de memoria') {
-        console.log('en espera de memoria');
-        console.log('asignando proceso');
         if (politica === 'MejorAjuste') {
-          console.log('mejor ajuste');
           proceso = manager.asignarProcesoMejorAjuste(proceso);
         } else {
-          console.log('primer ajuste');
           proceso = manager.asignarProcesoPrimerAjuste(proceso);
         }
       }
@@ -45,12 +57,13 @@ async function modificarDatos(
         }
         proceso.transcurrido++;
       }
+      proceso.tiempoTotalEnSistema++;
     });
-    
+
     self.postMessage(manager.getData());
     await new Promise((resolve) => setTimeout(resolve, 4000));
     if (manager.procesos.every((proceso) => proceso.estado === 'terminado'))
-    break;
+      break;
   } while (continuar);
   console.log('loop terminado');
 }
@@ -122,6 +135,18 @@ class managerDeMemoria {
 
     for (let i = 0; i < this.particiones.length; i++) {
       if (this.particiones[i].Proceso === proceso.nombre) {
+        const tiempoInicial = proceso.tiempoCreacion;
+        const tiempoFinal = new Date();
+
+        this.procesos[i].tiempoFinalizacion = tiempoFinal;
+
+        console.log(this.procesos[i].tiempoFinalizacion);
+
+        const tiempoTotalEnSistema =
+          tiempoFinal.getTime() - tiempoInicial.getTime();
+
+        this.procesos[i].tiempoTotalEnSistema = tiempoTotalEnSistema;
+
         this.particiones[i].Libre = true;
         this.particiones[i].Proceso = '';
         this.particiones[i].UtilizacionPorcentaje = 0;
