@@ -72,6 +72,7 @@ const AgregarProcesoModal: React.FC<Props> = ({
       transcurrido: 0,
       tiempoCreacion: new Date(),
       tiempoTotalEnSistema: 0,
+      tiempoFinalizacion: new Date(),
     };
     onAgregar(proceso);
     setMemoria(0);

@@ -16,8 +16,6 @@ import {
 import AgregarProcesoModal from './agregarProcesoModal';
 import { Proceso } from '../../../Types';
 
-
-
 interface ProcesosModalProps {
   isOpen: boolean;
   onDidDismiss: () => void;
@@ -34,14 +32,18 @@ const ProcesosModal: React.FC<ProcesosModalProps> = (props) => {
   const [procesos, setProcesos] = useState<Proceso[]>(props.procesos);
 
   const [showModalAgregarProceso, setShowModalAgregarProceso] = useState(false);
-  
+
   const { tamañoMaximoProceso } = props;
 
   useEffect(() => {
     setProcesos(props.procesos);
-  },[props.procesos]);
+  }, [props.procesos]);
 
-  
+  useEffect(() => {
+    if (procesos.length > 0) {
+      console.log(procesos);
+    }
+  }, [procesos]);
 
   const handleShowModalAgregarProceso = () => {
     setShowModalAgregarProceso(true);
@@ -61,6 +63,24 @@ const ProcesosModal: React.FC<ProcesosModalProps> = (props) => {
     onDidDismiss();
   };
 
+  const generarProcesos = () => {
+    const proccesos: Proceso[] = [];
+    for (let o = 0; o < 10; o++) {
+      const proceso: Proceso = {
+        id: o + 1,
+        nombre: `proceso ${o + 1}`,
+        memoria: Math.floor(Math.random() * tamañoMaximoProceso) + 1,
+        estado: 'en espera de memoria',
+        duracion: 5,
+        tiempoCreacion : new Date(),
+        tiempoTotalEnSistema: 0,
+        transcurrido: 0,
+      };
+      proccesos.push(proceso);
+    }
+    setProcesos(proccesos);
+  };
+
   return (
     <IonModal isOpen={isOpen} onDidDismiss={handleOnDismiss}>
       <IonHeader>
@@ -78,6 +98,8 @@ const ProcesosModal: React.FC<ProcesosModalProps> = (props) => {
                   Agregar Proceso
                 </IonButton>
               </IonCol>
+
+              <IonButton onClick={generarProcesos}>Generar proccesos</IonButton>
             </IonRow>
           </IonGrid>
         </IonToolbar>

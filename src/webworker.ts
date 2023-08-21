@@ -29,7 +29,15 @@ addEventListener('message', async (event) => {
     return;
   }
   continuar = data.continuar;
-  const { procesos, particionesEjecutadas, politica } = event.data;
+  // const { procesos, particionesEjecutadas, politica} = event.data;
+
+  const procesos: Proceso[] = event.data.procesos;
+
+  const particionesEjecutadas: ParticionEjecutada[] = event.data.particionesEjecutadas;
+
+  const politica: 'MejorAjuste' | 'PrimerAjuste' = event.data.politica;
+
+
   modificarDatos(procesos, particionesEjecutadas, politica);
 });
 
@@ -40,7 +48,9 @@ async function modificarDatos(
 ) {
   const manager = new managerDeMemoria(particionesEjecutadas, procesos);
   do {
-    manager.procesos.forEach((proceso) => {
+    manager.procesos.forEach(async (proceso) => {
+
+      const Proceso = proceso;
       if (proceso.estado === 'terminado') return;
 
       if (proceso.estado === 'en espera de memoria') {
@@ -52,16 +62,16 @@ async function modificarDatos(
       }
       if (proceso.estado === 'en memoria') {
         if (proceso.transcurrido >= proceso.duracion) {
-          proceso = manager.liberarProceso(proceso);
+          proceso = await manager.liberarProceso(proceso);
           return;
         }
         proceso.transcurrido++;
       }
-      proceso.tiempoTotalEnSistema++;
+      proceso.tiempoTotalEnSistema= (new Date().getTime() - proceso.tiempoCreacion.getTime())/1000;
     });
 
     self.postMessage(manager.getData());
-    await new Promise((resolve) => setTimeout(resolve, 4000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     if (manager.procesos.every((proceso) => proceso.estado === 'terminado'))
       break;
   } while (continuar);
@@ -130,27 +140,30 @@ class managerDeMemoria {
     return proceso;
   }
 
-  liberarProceso(proceso: Proceso): Proceso {
+  async liberarProceso(proceso: Proceso): Promise<Proceso> {
     if (proceso.estado === 'terminado') return proceso;
 
     for (let i = 0; i < this.particiones.length; i++) {
       if (this.particiones[i].Proceso === proceso.nombre) {
         const tiempoInicial = proceso.tiempoCreacion;
+        console.log(tiempoInicial);
         const tiempoFinal = new Date();
+        console.log(tiempoFinal);
 
-        this.procesos[i].tiempoFinalizacion = tiempoFinal;
-
-        console.log(this.procesos[i].tiempoFinalizacion);
+        proceso.tiempoFinalizacion = tiempoFinal;
 
         const tiempoTotalEnSistema =
           tiempoFinal.getTime() - tiempoInicial.getTime();
 
-        this.procesos[i].tiempoTotalEnSistema = tiempoTotalEnSistema;
+        console.log(tiempoTotalEnSistema/1000);
 
+        proceso.tiempoTotalEnSistema = tiempoTotalEnSistema / 1000;
         this.particiones[i].Libre = true;
         this.particiones[i].Proceso = '';
         this.particiones[i].UtilizacionPorcentaje = 0;
         proceso.estado = 'terminado';
+
+        return proceso;
       }
     }
     return proceso;

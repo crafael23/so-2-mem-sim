@@ -25,7 +25,7 @@ import ProcesosModal from './components/procesosModal';
 import ListaDeProcesos from './components/listaDeProcesos';
 import { Proceso } from '../../Types';
 
-const worker = new Worker('src/webworker.ts', {
+const worker = new Worker('src/webworker.js', {
   type: 'module',
 });
 
@@ -163,6 +163,13 @@ const Simulacion: React.FC = () => {
     setParticionesEjecutadas(modifiedArrays.particiones);
     setProcesos(modifiedArrays.procesos);
   };
+
+  useEffect(()=>{
+    if( procesos.length>0 && particionesEjecutadas.length>0){
+      console.log(procesos);
+      console.log(particionesEjecutadas);
+    }
+  },[procesos,particionesEjecutadas])
 
   const detener = () => {
     const continuar = false;
