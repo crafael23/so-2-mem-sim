@@ -80,7 +80,6 @@ const ConfiguracionParticiones: React.FC<Props> = (props) => {
     let MemoriaDisponible = memDisponible;
 
     if (Number.isNaN(cantidad) || cantidad === 0) {
-      console.log('el numero es NaN o es cero');
       const newParticiones = [...particiones];
 
       if (particiones[key] === undefined || Number.isNaN(particiones[key])) {
@@ -94,14 +93,9 @@ const ConfiguracionParticiones: React.FC<Props> = (props) => {
     }
 
     if (particiones[key] > 0 && !Number.isNaN(particiones[key])) {
-      console.log('esa particcion ya tiene un vaalor asignado, borrando');
       MemoriaDisponible = MemoriaDisponible + particiones[key];
     }
-
-    console.log(MemoriaDisponible);
     if (cantidad <= MemoriaDisponible) {
-
-      console.log("cantidad menor a memoria disponible");
       MemoriaDisponible = MemoriaDisponible - cantidad;
       setMemDisponible(MemoriaDisponible);
       handleChange(key, event.detail.value!);

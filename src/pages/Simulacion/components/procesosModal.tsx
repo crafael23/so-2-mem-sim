@@ -39,11 +39,6 @@ const ProcesosModal: React.FC<ProcesosModalProps> = (props) => {
     setProcesos(props.procesos);
   }, [props.procesos]);
 
-  useEffect(() => {
-    if (procesos.length > 0) {
-      console.log(procesos);
-    }
-  }, [procesos]);
 
   const handleShowModalAgregarProceso = () => {
     setShowModalAgregarProceso(true);
